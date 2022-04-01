@@ -1,80 +1,156 @@
-class Usuario{
-    constructor(opciones){
-        this.nombre = opciones.nombre;
-        this.apellido = opciones.apellido;
-        this.libros = opciones.libros;
-        this.mascotas = opciones.mascotas;
+const { count } = require("console");
+const fs = require("fs");
+
+let productos = [                                                                                                                                                     
+    {                                                                                                                                                    
+        title: 'Escuadra',                                                                                                                                 
+        price: 123.45,                                                                                                                                     
+        thumbnail: 'https://cdn3.iconfinder.com/data/icons/education-209/64/ruler-triangle-stationary-school-256.png',                                     
+        id: 1                                                                                                                                              
+    },                                                                                                                                                   
+    {                                                                                                                                                    
+        title: 'Calculadora',                                                                                                                              
+        price: 234.56,                                                                                                                                     
+        thumbnail: 'https://cdn3.iconfinder.com/data/icons/education-209/64/calculator-math-tool-school-256.png',                                          
+        id: 2                                                                                                                                              
+    },                                                                                                                                                   
+    {                                                                                                                                                    
+        title: 'Globo Terráqueo',                                                                                                                          
+        price: 345.67,                                                                                                                                     
+        thumbnail: 'https://cdn3.iconfinder.com/data/icons/education-209/64/globe-earth-geograhy-planet-school-256.png',                                   
+        id: 3                                                                                                                                              
+    }                                                                                                                                                    
+]
+
+fs.readFile("./productos.json", "utf-8", (err, data)=>{
+    if(err){
+        console.error("Error al escribir.")
+    }
+    if(data){
+        fs.writeFile("./productos.json", JSON.stringify(productos), {encoding: "utf-8"}, (err)=>{
+            if(err){
+                console.error("Error al escribir.   ")
+            }
+        })
+    }
+})
+
+class Contenedor{
+    constructor(archivo){
+        this.archivo = archivo;
     }
 
-    getFullName(){
+    save(objeto) //: Number - Recibe un objeto, lo guarda en el archivo, devuelve el id asignado.
+    {
+        fs.readFile(`./${this.archivo}`, "utf-8", (err, data)=>{
+            if(err){
+                console.error("Error al leer.");
+            }else
+            {
 
-        return "Mi nombre completo es " + this.nombre + " " + this.apellido;
+                let productos = JSON.parse(data);
+
+                if(productos.length !== 4){
+
+                    productos.push(objeto);
+
+                    console.log(productos);
+
+                    fs.writeFile(`./${this.archivo}`, JSON.stringify(productos), "utf-8", (error) =>{
+                        if(error){
+                            console.log("Se produjo un error")
+                            }
+                    }
+                    )
+
+            }
+        }
+        })
+
 
     }
 
-    addMascota(nombre){
-        this.mascotas.push(nombre);
-
-        return "El nombre de mi mascota es " + nombre + ". Mis tíos tienen 3 perros llamados " + this.mascotas[0] + ", " + this.mascotas[1] + " y " + this.mascotas[2];
-    }
-
-    countMascotas(){
-
-        return "Yo tengo " + this.mascotas.length + " mascotas"; 
-
-    }
-
-    addBook(autor, titulo){
-
-        let nuevoObjeto = {
-            autor: autor,
-            titulo: titulo
+    getById(Number) //: Object - Recibe un id y devuelve el objeto con ese id, o null si no está.
+    {
+        fs.readFile(`./${this.archivo}`, "utf-8", (err, data)=>{
+            if(err){
+                console.error("Error al leer.")
+            }else
+            {
+                let encontrarProducto = JSON.parse(data).find(x => {
+                    return x.id == Number
+                })
+                console.log(encontrarProducto);
+            }
+        })
         }
 
-        this.libros.push(nuevoObjeto);
-
-        let posicionLibro = this.libros[this.libros.length-1];
-
-        return "Mi libro favorito es " + posicionLibro.titulo + " y su autor es " + posicionLibro.autor;
-
-    }
-
-    getBookNames(){
-
-        let librosAutores = [];
-
-        let i=0;
-
-        while(this.libros.length > i){
-
-        librosAutores.push(this.libros[i].titulo)
-
-        i++;
+    getAll() //: Object[] - Devuelve un array con los objetos presentes en el archivo.
+    {
+        fs.readFile(`./${this.archivo}`, "utf-8", (err, data)=>{
+            if(err){
+                console.error("Error al leer.")
+            }else
+            {
+                console.log(JSON.parse(data))
+            }
+        })
         }
-        
-        return librosAutores
 
+    deleteById(Number) //: void - Elimina del archivo el objeto con el id buscado.
+    {
+        fs.readFile(`./${this.archivo}`, "utf-8", (err, data)=>{
+            if(err){
+                console.error("Error al leer.")
+            }else
+            {
+                let ListaSinProducto = JSON.parse(data).filter(x => {
+                    return x.id != Number
+                })
+                fs.writeFile(`./${this.archivo}`, JSON.stringify(ListaSinProducto), "utf-8", (error) =>{
+                    if(error){
+                        console.log("Se produjo un error")
+                        }
+                        console.log(ListaSinProducto)
+                })
+            }
+        })
+        }
+
+    deleteAll() //: void - Elimina todos los objetos presentes en el archivo.
+    {
+        fs.readFile(`./${this.archivo}`, "utf-8", (err, data)=>{
+            if(err){
+                console.error("Error al leer.")
+            }else
+            {
+                let ListaLimpia = [];
+                fs.write(`./${this.archivo}`, JSON.stringify(ListaLimpia), "utf-8", (error) =>{
+                    if(error){
+                        console.log("Se produjo un error")
+                        }
+                        console.log(ListaLimpia)
+                })
+                
+            }
+        })
+        }
+    
     }
-}
 
-let nuevoObjeto = {
-    nombre: "Manuel",
-    apellido: "Gallego",
-    libros: [{titulo: "Steve Jobs ", autor:"Walter Isaacsoon"}, {titulo: "Yo, Robot ", autor:"Isaac Asimov"}, {titulo: "Ready Player One ", autor:"Ernest Cline"}],
-    mascotas: ["Fraco", "Osvaldo", "Olivia"]
-}
+            const archivo = new Contenedor("productos.json");
 
-let nuevoUsuario = new Usuario(nuevoObjeto)
+            archivo.save({                                                                                                                                  
+                title: 'NotePad',                                                                                                                              
+                price: 129.59,                                                                                                                                     
+                thumbnail: 'https://cdn3.iconfinder.com/data/icons/education-209/64/calculator-math-tool-school-256.png',                                          
+                id: 4
+                })
 
-let ul = $("<ul>").addClass("list-unstyled");
+            archivo.getById(2)
 
-let lista = $(`
-    <li> ${nuevoUsuario.getFullName()} </li>
-    <li> ${nuevoUsuario.addMascota("Rolfi")} </li>
-    <li> ${nuevoUsuario.countMascotas()} </li>
-    <li> ${nuevoUsuario.addBook("George Orwell", "1984")} </li>
-    <li> ${nuevoUsuario.getBookNames()} </li>`);
+            archivo.getAll()
 
-    ul.append(lista)
+            //archivo.deleteById(2)
 
-$(".container").append(ul)
+            //archivo.deleteAll()
